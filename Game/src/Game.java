@@ -3,6 +3,8 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferStrategy;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 
@@ -10,8 +12,8 @@ public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1L;
     public static final int WIDTH = 320;
-    public static final int HEIGHT = WIDTH / 2 * 9;
-    public static final int SCALE = 2;
+    public static final int HEIGHT = WIDTH / 2;
+    public static final int SCALE = 4;
     public final String TITLE = "2D Game";
 
     private boolean running = false;
@@ -19,6 +21,21 @@ public class Game extends Canvas implements Runnable {
 
     // BufferedImage will load the image before rendering it
     private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB); // buffer the entire window
+    private BufferedImage spriteSheet = null;
+
+    private Player p;
+
+    public void init() {
+        BufferedImageLoader loader = new BufferedImageLoader();
+        try {
+            spriteSheet = loader.loadImage("./throwSS.png");
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        addKeyListener(new KeyInput(this));
+        p = new Player(200, 200, this);
+    }
 
     // start tbe game
     // synchronized prevents other methods from running at the same time
@@ -51,6 +68,7 @@ public class Game extends Canvas implements Runnable {
 
     // game loop (handles updates)
     public void run() {
+        init();
         long initTime = System.nanoTime();
         final double amountOfTicks = 60.0; // 60 fps
         double ns = 1000000000 / amountOfTicks; 
@@ -86,7 +104,7 @@ public class Game extends Canvas implements Runnable {
 
     // game updates
     private void tick() {
-
+        p.tick();
     }
 
     // game render
@@ -101,9 +119,28 @@ public class Game extends Canvas implements Runnable {
         Graphics g = bs.getDrawGraphics(); // draws out the buffers
 
         g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+        p.render(g);
 
         g.dispose();
         bs.show();
+    }
+
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        if(key == KeyEvent.VK_RIGHT) {
+            p.setX(p.getX() + 5);
+        } else if(key == KeyEvent.VK_LEFT) {
+            p.setX(p.getX() - 5);
+        } else if(key == KeyEvent.VK_DOWN) {
+            p.setY(p.getY() + 5);
+        } else if(key == KeyEvent.VK_UP) {
+            p.setY(p.getY() - 5);
+        }
+    }
+
+    public void keyReleased(KeyEvent e) {
+
     }
 
     public static void main(String args[]) {
@@ -121,6 +158,12 @@ public class Game extends Canvas implements Runnable {
         frame.setVisible(true);
 
         game.start();
+    }
+
+    // Getter & Setters
+    public BufferedImage getSpriteSheet() {
+        // return the sprite sheet for player class to use
+        return spriteSheet;
     }
 
 }
