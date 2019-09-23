@@ -22,19 +22,26 @@ public class Game extends Canvas implements Runnable {
     // BufferedImage will load the image before rendering it
     private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB); // buffer the entire window
     private BufferedImage spriteSheet = null;
+    private BufferedImage orange = null;
+
+    private boolean is_shooting = false;
 
     private Player p;
+    private Controller c;
 
     public void init() {
+        requestFocus();
         BufferedImageLoader loader = new BufferedImageLoader();
         try {
             spriteSheet = loader.loadImage("./throwSS.png");
+            orange = loader.loadImage("./orange.png");
         } catch(IOException e) {
             e.printStackTrace();
         }
 
         addKeyListener(new KeyInput(this));
         p = new Player(200, 200, this);
+        c = new Controller(this);
     }
 
     // start tbe game
@@ -105,6 +112,7 @@ public class Game extends Canvas implements Runnable {
     // game updates
     private void tick() {
         p.tick();
+        c.tick();
     }
 
     // game render
@@ -120,6 +128,7 @@ public class Game extends Canvas implements Runnable {
 
         g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
         p.render(g);
+        c.render(g);
 
         g.dispose();
         bs.show();
@@ -129,31 +138,47 @@ public class Game extends Canvas implements Runnable {
         int key = e.getKeyCode();
 
         if(key == KeyEvent.VK_RIGHT) {
-            p.setX(p.getX() + 5);
+            p.setVelX(5);
         } else if(key == KeyEvent.VK_LEFT) {
-            p.setX(p.getX() - 5);
+            p.setVelX(-5);
         } else if(key == KeyEvent.VK_DOWN) {
-            p.setY(p.getY() + 5);
+            p.setVelY(5);
         } else if(key == KeyEvent.VK_UP) {
-            p.setY(p.getY() - 5);
+            p.setVelY(-5);
+        } else if(key == KeyEvent.VK_SPACE && !is_shooting) {
+            is_shooting = true;
+            c.addBullet(new Bullet(p.getX(), p.getY(), this));
         }
     }
 
     public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
 
+        if(key == KeyEvent.VK_RIGHT) {
+            p.setVelX(0);
+        } else if(key == KeyEvent.VK_LEFT) {
+            p.setVelX(0);
+        } else if(key == KeyEvent.VK_DOWN) {
+            p.setVelY(0);
+        } else if(key == KeyEvent.VK_UP) {
+            p.setVelY(0);
+        } else if(key == KeyEvent.VK_SPACE) {
+            is_shooting = false;
+        }
     }
 
     public static void main(String args[]) {
         Game game = new Game();
-        game.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-        game.setMaximumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-        game.setMinimumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+        game.setPreferredSize(new Dimension(950, 600));
+        game.setMaximumSize(new Dimension(950, 600));
+        game.setMinimumSize(new Dimension(950, 600));
 
         JFrame frame = new JFrame(game.TITLE);
+
         frame.add(game);
-        frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
+        frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
@@ -164,6 +189,10 @@ public class Game extends Canvas implements Runnable {
     public BufferedImage getSpriteSheet() {
         // return the sprite sheet for player class to use
         return spriteSheet;
+    }
+
+    public BufferedImage getOrange(){
+        return orange;
     }
 
 }
