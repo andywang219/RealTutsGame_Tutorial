@@ -9,15 +9,13 @@ public class Player {
     private double velX = 0; // velocity x 
     private double velY = 0; // velocity y
 
-    private BufferedImage player;
+    private Textures text;
 
     // initialize player (constructor)
-    public Player(double x, double y, Game game) {
+    public Player(double x, double y, Textures text) {
         this.x = x;
         this.y = y;
-
-        SpriteSheet ss = new SpriteSheet(game.getSpriteSheet()); // get the sprite sheet from Game class
-        player = ss.grabImage(1, 1, 256, 256);
+        this.text = text;
     }
 
     // update method
@@ -40,7 +38,7 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        g.drawImage(player, (int)x, (int)y, null);
+        g.drawImage(text.player, (int)x, (int)y, null);
     }
 
     // getters and setters

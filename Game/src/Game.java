@@ -11,8 +11,8 @@ import javax.swing.JFrame;
 public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1L;
-    public static final int WIDTH = 320;
-    public static final int HEIGHT = WIDTH / 2;
+    public static final int WIDTH = 950;
+    public static final int HEIGHT = 600;
     public static final int SCALE = 4;
     public final String TITLE = "2D Game";
 
@@ -23,11 +23,13 @@ public class Game extends Canvas implements Runnable {
     private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB); // buffer the entire window
     private BufferedImage spriteSheet = null;
     private BufferedImage orange = null;
+    private BufferedImage enemy = null;
 
     private boolean is_shooting = false;
 
     private Player p;
     private Controller c;
+    private Textures text;
 
     public void init() {
         requestFocus();
@@ -35,13 +37,16 @@ public class Game extends Canvas implements Runnable {
         try {
             spriteSheet = loader.loadImage("./throwSS.png");
             orange = loader.loadImage("./orange.png");
+            enemy = loader.loadImage("./owlet.png");
         } catch(IOException e) {
             e.printStackTrace();
         }
 
         addKeyListener(new KeyInput(this));
-        p = new Player(200, 200, this);
-        c = new Controller(this);
+
+        text = new Textures(this);
+        p = new Player(200, 200, text);
+        c = new Controller(this, text);
     }
 
     // start tbe game
@@ -147,7 +152,7 @@ public class Game extends Canvas implements Runnable {
             p.setVelY(-5);
         } else if(key == KeyEvent.VK_SPACE && !is_shooting) {
             is_shooting = true;
-            c.addBullet(new Bullet(p.getX(), p.getY(), this));
+            c.addBullet(new Bullet(p.getX(), p.getY(), text));
         }
     }
 
@@ -169,9 +174,9 @@ public class Game extends Canvas implements Runnable {
 
     public static void main(String args[]) {
         Game game = new Game();
-        game.setPreferredSize(new Dimension(950, 600));
-        game.setMaximumSize(new Dimension(950, 600));
-        game.setMinimumSize(new Dimension(950, 600));
+        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        game.setMaximumSize(new Dimension(WIDTH, HEIGHT));
+        game.setMinimumSize(new Dimension(WIDTH, HEIGHT));
 
         JFrame frame = new JFrame(game.TITLE);
 
@@ -193,6 +198,10 @@ public class Game extends Canvas implements Runnable {
 
     public BufferedImage getOrange(){
         return orange;
+    }
+
+    public BufferedImage getEnemy(){
+        return enemy;
     }
 
 }
