@@ -1,10 +1,8 @@
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-public class Player {
-
-    private double x; // x and y position
-    private double y;
+public class Player extends GameObject implements EntityA {
 
     private double velX = 0; // velocity x 
     private double velY = 0; // velocity y
@@ -13,8 +11,7 @@ public class Player {
 
     // initialize player (constructor)
     public Player(double x, double y, Textures text) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
         this.text = text;
     }
 
@@ -23,22 +20,27 @@ public class Player {
         x += velX;
         y += velY;
 
-        if(x <= -110) {
-            x = -110;
+        if(x <= 0) {
+            x = 0;
         }
-        if(x >= 800) {
-            x = 800;
+        if(x >= Game.WIDTH - 32) {
+            x = Game.WIDTH - 32;
         }
-        if(y <= -100) {
-            y = -100;
+        if(y <= 0) {
+            y = 0;
         }
-        if(y >= 440) {
-            y = 440;
+        if(y >= Game.HEIGHT - 32) {
+            y = Game.HEIGHT - 32;
         }
     }
 
     public void render(Graphics g) {
         g.drawImage(text.player, (int)x, (int)y, null);
+    }
+
+    // hit box
+    public Rectangle getBounds() {
+        return new Rectangle((int) x, (int) y, 32, 32);
     }
 
     // getters and setters

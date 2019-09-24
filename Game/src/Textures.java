@@ -18,9 +18,9 @@ public class Textures {
     }
 
     private void getTextures() {
-        player = ss.grabImage(1, 1, 256, 256);
-        orange = orange_ss.grabImage(1, 1, 256, 256);
-        enemy = enemy_ss.grabImage(1, 1, 256, 256);
+        player = ss.grabImage(2, 1, 32, 32);
+        orange = orange_ss.grabImage(1, 1, 32, 32);
+        enemy = enemy_ss.grabImage(2, 1, 32, 32);
     }
 
 }

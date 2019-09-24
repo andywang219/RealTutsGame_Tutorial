@@ -1,72 +1,82 @@
 import java.util.LinkedList;
+import java.util.Random;
 import java.awt.Graphics;
 
 public class Controller {
 
-    private LinkedList<Bullet> b = new LinkedList<Bullet>();
-    private LinkedList<Enemy> e = new LinkedList<Enemy>();
+    private LinkedList<EntityA> ea = new LinkedList<EntityA>();
+    private LinkedList<EntityB> eb = new LinkedList<EntityB>();
 
-    Bullet TempBullet;
-    Enemy TempEnemy;
-    Game game;
+    EntityA enta;
+    EntityB entb;
+    Random r = new Random();
     Textures text;
 
-    public Controller(Game game, Textures text) {
-        this.game = game;
+    public Controller(Textures text) {
         this.text = text;
+    }
 
-        for(int x = 0; x < Game.WIDTH; x += 256) {
-            addEnemy(new Enemy(x, 0, text));
+    // create more enemies based on enemy_count from Game
+    public void createEnemy(int enemy_count) {
+        for(int i = 0; i < enemy_count; i++) {
+            addEntity(new Enemy(r.nextInt(Game.WIDTH - 32), -10, text)); // will automatically know its a EntityB b/c enemy is EntityB
         }
     }
     
     // updates each individual bullet / projectile
-    // use a linklist to store all bullets
     public void tick() {
-        for(int i = 0; i < b.size(); i++) {
-            TempBullet = b.get(i);
-
-            if(TempBullet.getX() > 800) {
-                removeBullet(TempBullet);
-            }
-
-            TempBullet.tick();
+        // Entity A
+        for(int i = 0; i < ea.size(); i++) {
+            enta = ea.get(i);
+            enta.tick();
         }
-        for(int i = 0; i < e.size(); i++) {
-            TempEnemy = e.get(i);
 
-            TempEnemy.tick();
+        // Entity B
+        for(int i = 0; i < eb.size(); i++) {
+            entb = eb.get(i);
+            entb.tick();
         }
     }
     
     // render each bullet
     public void render(Graphics g) {
-        for(int i = 0; i < b.size(); i++) {
-            TempBullet = b.get(i);
-
-            TempBullet.render(g);
+        // Entity A
+        for(int i = 0; i < ea.size(); i++) {
+            enta = ea.get(i);
+            enta.render(g);
         }
-        for(int i = 0; i < e.size(); i++) {
-            TempEnemy = e.get(i);
 
-            TempEnemy.render(g);
+        // Entity B
+        for(int i = 0; i < eb.size(); i++) {
+            entb = eb.get(i);
+            entb.render(g);
         }
     }
-
-    public void addBullet(Bullet block) {
-        b.add(block);
+    
+    // Entity A
+    public void addEntity(EntityA block) {
+        ea.add(block);
+    }
+    
+    public void removeEntity(EntityA block) {
+        ea.remove(block);
     }
 
-    public void removeBullet(Bullet block) {
-        b.remove(block);
+    // Entity B
+    public void addEntity(EntityB block) {
+        eb.add(block);
+    }
+    
+    public void removeEntity(EntityB block) {
+        eb.remove(block);
     }
 
-    public void addEnemy(Enemy block) {
-        e.add(block);
+    public LinkedList<EntityA> getEntityA() {
+        return ea;
     }
 
-    public void removeEnemy(Enemy block) {
-        e.remove(block);
+    public LinkedList<EntityB> getEntityB() {
+        return eb;
     }
 
 }

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferStrategy;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -27,17 +28,23 @@ public class Game extends Canvas implements Runnable {
 
     private boolean is_shooting = false;
 
+    private int enemy_count = 3; // how many enemies are on the map
+    private int enemy_killed = 0; // how many enemies you killed
+
     private Player p;
     private Controller c;
     private Textures text;
+
+    public LinkedList<EntityA> ea; 
+    public LinkedList<EntityB> eb; 
 
     public void init() {
         requestFocus();
         BufferedImageLoader loader = new BufferedImageLoader();
         try {
-            spriteSheet = loader.loadImage("./throwSS.png");
-            orange = loader.loadImage("./orange.png");
-            enemy = loader.loadImage("./owlet.png");
+            spriteSheet = loader.loadImage("./res/throw_ss.png");
+            orange = loader.loadImage("./res/orange_ss.png");
+            enemy = loader.loadImage("./res/owlet_up_down_ss.png");
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -45,8 +52,13 @@ public class Game extends Canvas implements Runnable {
         addKeyListener(new KeyInput(this));
 
         text = new Textures(this);
-        p = new Player(200, 200, text);
-        c = new Controller(this, text);
+        p = new Player(100, 100, text);
+        c = new Controller(text);
+
+        ea = c.getEntityA();
+        eb = c.getEntityB();
+
+        c.createEnemy(enemy_count);
     }
 
     // start tbe game
@@ -143,16 +155,16 @@ public class Game extends Canvas implements Runnable {
         int key = e.getKeyCode();
 
         if(key == KeyEvent.VK_RIGHT) {
-            p.setVelX(5);
+            p.setVelX(3);
         } else if(key == KeyEvent.VK_LEFT) {
-            p.setVelX(-5);
+            p.setVelX(-3);
         } else if(key == KeyEvent.VK_DOWN) {
-            p.setVelY(5);
+            p.setVelY(3);
         } else if(key == KeyEvent.VK_UP) {
-            p.setVelY(-5);
+            p.setVelY(-3);
         } else if(key == KeyEvent.VK_SPACE && !is_shooting) {
             is_shooting = true;
-            c.addBullet(new Bullet(p.getX(), p.getY(), text));
+            c.addEntity(new Bullet(p.getX(), p.getY(), text, this));
         }
     }
 
@@ -196,12 +208,20 @@ public class Game extends Canvas implements Runnable {
         return spriteSheet;
     }
 
-    public BufferedImage getOrange(){
+    public BufferedImage getOrange() {
         return orange;
     }
 
-    public BufferedImage getEnemy(){
+    public BufferedImage getEnemy() {
         return enemy;
+    }
+
+    public int getEnemy_killed() {
+        return enemy_killed;
+    }
+
+    public void setEnemy_killed(int enemy_killed) {
+        this.enemy_killed = enemy_killed;
     }
 
 }
