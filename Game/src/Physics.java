@@ -11,4 +11,14 @@ public class Physics {
         }
         return false;
     }
+
+    // check if the B class runs into the A class
+    public static boolean Collision(EntityB entb, LinkedList<EntityA> enta) {
+        for (int i = 0; i < enta.size(); i++) { // loop through A class
+            if (entb.getBounds().intersects(enta.get(i).getBounds())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -24,7 +24,7 @@ public class Game extends Canvas implements Runnable { // taking everything from
 
     private boolean is_shooting = false;
 
-    private int enemy_count = 1; // how many space ships to spawn
+    private int enemy_count = 3; // how many space ships to spawn
     private int enemy_killed = 0; // # of space ships killed
 
     private Player p;
@@ -47,7 +47,7 @@ public class Game extends Canvas implements Runnable { // taking everything from
         addKeyListener(new KeyInput(this));
         tex = new Textures(this);
         p = new Player(200, 200, tex);
-        c = new Controller(tex);
+        c = new Controller(tex, this);
 
         c.createEnemy(enemy_count);
         ea = c.getEntityA();
@@ -109,6 +109,11 @@ public class Game extends Canvas implements Runnable { // taking everything from
     private void tick() {
         p.tick();
         c.tick();
+        if (enemy_killed >= enemy_count) {
+            enemy_count += 2; 
+            enemy_killed = 0;
+            c.createEnemy(enemy_count);
+        }
     }
 
     // eveything in game that renders

@@ -6,14 +6,16 @@ public class Controller {
     // Linked lists are nice for things we may have more than 5 of on a screen at once
     private LinkedList<EntityA> ea = new LinkedList<EntityA>();
     private LinkedList<EntityB> eb = new LinkedList<EntityB>();
+    private Game game;
     EntityA enta;
     EntityB entb;
 
     Random r = new Random();
     private Textures tex;
 
-    public Controller(Textures tex) {
+    public Controller(Textures tex, Game game) {
         this.tex = tex;
+        this.game = game;
         // for (int i = 0; i < 20; i+=5) {
         //     addEntity(new Enemy(r.nextInt(640), 10, tex));
         // }
@@ -21,7 +23,7 @@ public class Controller {
 
     public void createEnemy(int enemy_count) {
         for (int i = 0; i < enemy_count; i++) {
-            addEntity(new Enemy(r.nextInt(640), -10, tex));
+            addEntity(new Enemy(r.nextInt(640), -10, tex, this, game));
         }
     }
 

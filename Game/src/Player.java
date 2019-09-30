@@ -6,7 +6,7 @@ public class Player extends GameObject implements EntityA {
     private double velX = 0;
     private double velY = 0;
     private Textures tex;
-    Animation anim;
+    private Animation anim;
 
     public Player(double x, double y, Textures tex) {
         // intialize player's location in the game
