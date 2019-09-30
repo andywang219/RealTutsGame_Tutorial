@@ -11,5 +11,4 @@ public class BufferedImageLoader {
         image = ImageIO.read(getClass().getResource(path));
         return image;
     }
-
 }

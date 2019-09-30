@@ -1,15 +1,16 @@
-import java.awt.*;
 import java.awt.Canvas;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
+import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
+import java.util.LinkedList;
 
-public class Game extends Canvas implements Runnable {
-
+public class Game extends Canvas implements Runnable { // taking everything from canvas class and bringing it to Game (ruunable requires a certain method)
     private static final long serialVersionUID = 1L;
     public static final int WIDTH = 950;
     public static final int HEIGHT = 600;
@@ -19,162 +20,163 @@ public class Game extends Canvas implements Runnable {
     private boolean running = false;
     private Thread thread;
 
-    // BufferedImage will load the image before rendering it
-    private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB); // buffer the entire window
+    // buffer image: buffer/load the image before it projects and renders it - buffers whole window and access RGB
+    private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
     private BufferedImage spriteSheet = null;
-    private BufferedImage orange = null;
-    private BufferedImage enemy = null;
+    private BufferedImage background = null;
+    private BufferedImage fruits = null;
 
     private boolean is_shooting = false;
 
+    private int enemy_count = 3; // how many space ships to spawn
+    private int enemy_killed = 0; // # of space ships killed
+
     private Player p;
     private Controller c;
-    private Textures text;
+    private Textures tex;
+
+    public LinkedList<EntityA> ea;
+    public LinkedList<EntityB> eb;
 
     public void init() {
-        requestFocus();
+        requestFocus(); // bring focus to the screen
         BufferedImageLoader loader = new BufferedImageLoader();
         try {
-            spriteSheet = loader.loadImage("./throwSS.png");
-            orange = loader.loadImage("./orange.png");
-            enemy = loader.loadImage("./owlet.png");
-        } catch(IOException e) {
+            spriteSheet = loader.loadImage("./res/pink_ss.png");
+            fruits = loader.loadImage("./res/fruits_ss.png");
+            background = loader.loadImage("./res/background.png");
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         addKeyListener(new KeyInput(this));
+        tex = new Textures(this);
+        p = new Player(200, 200, tex);
+        c = new Controller(tex, this);
 
-        text = new Textures(this);
-        p = new Player(200, 200, text);
-        c = new Controller(this, text);
+        c.createEnemy(enemy_count);
+        ea = c.getEntityA();
+        eb = c.getEntityB();
     }
 
-    // start tbe game
-    // synchronized prevents other methods from running at the same time
-    private synchronized void start() {
-        if(running) {
-            // already running
-            return;
-        }
-
+    private synchronized void start() { // to start our thread
+        if (running) return;
         running = true;
         thread = new Thread(this);
         thread.start();
     }
 
-    // stop the game
-    private synchronized void stop() {
-        if(!running) {
-            // not running already
-            return;
-        }
-
+    private synchronized void stop() { // to end our thread
+        if (!running) return;
         running = false;
         try {
-            thread.join(); // join all threads together and waits for them to die
+            thread.join(); // joins all threads together and waits for them to die
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         System.exit(1);
     }
 
-    // game loop (handles updates)
     public void run() {
         init();
-        long initTime = System.nanoTime();
+        long lastTime = System.nanoTime();
         final double amountOfTicks = 60.0; // 60 fps
-        double ns = 1000000000 / amountOfTicks; 
-        double delta = 0; // calculate time passed so that it catch itself up if ticks / frames are behind
-        int updates = 0; // ticks
-        int frames = 0; // FPS
+        double ns = 1000000000 / amountOfTicks;
+        double delta = 0; // time passed so that it can catch up
+        int updates = 0;
+        int frames = 0;
         long timer = System.currentTimeMillis();
-
-        while(running) {
+        // updates the game a certain amount of times
+        while (running) {
+            // this would be the game loop
             long now = System.nanoTime();
-            delta += (now - initTime) / ns; // gives the elapsed time since the run method was entered in seconds
-            initTime = now;
-
-            if(delta >= 1) {
+            delta += (now - lastTime) / ns;
+            lastTime = now;
+            if (delta >= 1) {
                 tick();
                 updates++;
                 delta--;
             }
-
             render();
             frames++;
 
-            if(System.currentTimeMillis() - timer > 1000) {
-                timer += 1000; // so it wouldn't loop through again
-                System.out.println(updates + " Ticks, FPS " + frames);
+            if (System.currentTimeMillis() - timer > 1000) {
+                timer += 1000; // prevent looping again
+                System.out.println(updates + " Ticks, Fps " + frames);
                 updates = 0;
                 frames = 0;
             }
         }
-
         stop();
     }
 
-    // game updates
+    // eveything in game that updates
     private void tick() {
         p.tick();
         c.tick();
+        if (enemy_killed >= enemy_count) {
+            enemy_count += 2; 
+            enemy_killed = 0;
+            c.createEnemy(enemy_count);
+        }
     }
 
-    // game render
+    // eveything in game that renders
     private void render() {
-        BufferStrategy bs = this.getBufferStrategy();
+        // buffer strategy handles all buffering behind the scenes
+        BufferStrategy bs = this.getBufferStrategy(); // accessed from Canvas; eventually need to dispose of this
 
-        if(bs == null) {
-            createBufferStrategy(3); // creates 3 buffers
+        // initialize once and done
+        if (bs == null) {
+            createBufferStrategy(3); // 3 means 3 buffers (buffer behind buffer behind screen and shoots to screen: improves time/performance)
             return;
         }
 
-        Graphics g = bs.getDrawGraphics(); // draws out the buffers
-
+        Graphics g = bs.getDrawGraphics();
+        ////////////////////////// In between these, we can draw out stuff
         g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+        g.drawImage(background, 0, 0, null);
         p.render(g);
         c.render(g);
-
+        //////////////////////////
         g.dispose();
         bs.show();
     }
 
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-
-        if(key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_D) {
             p.setVelX(5);
-        } else if(key == KeyEvent.VK_LEFT) {
+        } else if (key == KeyEvent.VK_A) {
             p.setVelX(-5);
-        } else if(key == KeyEvent.VK_DOWN) {
+        } else if (key == KeyEvent.VK_S) {
             p.setVelY(5);
-        } else if(key == KeyEvent.VK_UP) {
+        } else if (key == KeyEvent.VK_W) {
             p.setVelY(-5);
-        } else if(key == KeyEvent.VK_SPACE && !is_shooting) {
+        } else if (key == KeyEvent.VK_SPACE && !is_shooting) {
             is_shooting = true;
-            c.addBullet(new Bullet(p.getX(), p.getY(), text));
+            c.addEntity(new Bullet(p.getX(), p.getY(), tex, this));
         }
     }
 
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-
-        if(key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_D) {
             p.setVelX(0);
-        } else if(key == KeyEvent.VK_LEFT) {
+        } else if (key == KeyEvent.VK_A) {
             p.setVelX(0);
-        } else if(key == KeyEvent.VK_DOWN) {
+        } else if (key == KeyEvent.VK_S) {
             p.setVelY(0);
-        } else if(key == KeyEvent.VK_UP) {
+        } else if (key == KeyEvent.VK_W) {
             p.setVelY(0);
-        } else if(key == KeyEvent.VK_SPACE) {
+        } else if (key == KeyEvent.VK_SPACE) {
             is_shooting = false;
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         Game game = new Game();
-        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        game.setPreferredSize(new Dimension(WIDTH, HEIGHT)); // Dimension: class to encapsulate a width and heigh dimension
         game.setMaximumSize(new Dimension(WIDTH, HEIGHT));
         game.setMinimumSize(new Dimension(WIDTH, HEIGHT));
 
@@ -190,18 +192,27 @@ public class Game extends Canvas implements Runnable {
         game.start();
     }
 
-    // Getter & Setters
     public BufferedImage getSpriteSheet() {
-        // return the sprite sheet for player class to use
         return spriteSheet;
     }
 
-    public BufferedImage getOrange(){
-        return orange;
+    public BufferedImage getFruitsSheet() {
+        return fruits;
     }
 
-    public BufferedImage getEnemy(){
-        return enemy;
+    public void setEnemy_count(int enemy_count) {
+        this.enemy_count = enemy_count;
     }
 
+    public void setEnemy_killed(int enemy_killed) {
+        this.enemy_killed = enemy_killed;
+    }
+
+    public int getEnemy_count() {
+        return enemy_count;
+    }
+
+    public int getEnemy_killed() {
+        return enemy_killed;
+    }
 }

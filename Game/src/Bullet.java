@@ -1,31 +1,40 @@
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import java.awt.Rectangle;
 
-public class Bullet {
+public class Bullet extends GameObject implements EntityA {
+    private Textures tex;
+    private Game game;
+    private Animation anim;
 
-    private double x;
-    private double y;
-
-    private Textures text;
-
-    // projectile
-    public Bullet(double x, double y, Textures text) {
-        this.x = x;
-        this.y = y;
-        this.text = text;
+    public Bullet(double x, double y, Textures tex, Game game) {
+        super(x, y);
+        this.tex = tex;
+        this.game = game;
+        anim = new Animation(tex.missile, 3, 6, 1, 3);
     }
 
-    // update
     public void tick() {
-        x += 5;
+        y -= 5;
+        /*if (Physics.Collision(this, game.eb)) {
+            System.out.println("COLLISION DETECTED");
+        }*/
+        anim.runAnimation();
     }
 
     public void render(Graphics g) {
-        g.drawImage(text.orange, (int) x, (int) y, null);
+        // g.drawImage(tex.missile, (int) x, (int) y, null);
+        anim.drawAnimation(g, x, y, 0);
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle((int)x, (int)y, 32, 32); // width and height to establish the proper hitbox around a sprite
     }
 
     public double getX() {
         return x;
     }
 
+    public double getY() {
+        return y;
+    }
 }

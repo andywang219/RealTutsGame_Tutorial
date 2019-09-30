@@ -1,47 +1,49 @@
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import java.awt.Rectangle;
+//import java.awt.image.BufferedImage;
 
-public class Player {
+public class Player extends GameObject implements EntityA {
+    private double velX = 0;
+    private double velY = 0;
+    private Textures tex;
+    private Animation anim;
 
-    private double x; // x and y position
-    private double y;
-
-    private double velX = 0; // velocity x 
-    private double velY = 0; // velocity y
-
-    private Textures text;
-
-    // initialize player (constructor)
-    public Player(double x, double y, Textures text) {
-        this.x = x;
-        this.y = y;
-        this.text = text;
+    public Player(double x, double y, Textures tex) {
+        // intialize player's location in the game
+        super(x, y); // from game object class
+        this.tex = tex;
+        anim = new Animation(tex.player, 3, 6, 1, 3); // frames, speed, 1 column by 3 rows (last 2 parameters)
+        // format: frames, speed, col, row
     }
 
-    // update method
     public void tick() {
         x += velX;
         y += velY;
 
-        if(x <= -110) {
-            x = -110;
+        if(x <= 0) {
+            x = 0;
         }
-        if(x >= 800) {
-            x = 800;
+        if(x >= Game.WIDTH - 32) {
+            x = Game.WIDTH - 32;
         }
-        if(y <= -100) {
-            y = -100;
+        if(y <= 0) {
+            y = 0;
         }
-        if(y >= 440) {
-            y = 440;
+        if(y >= Game.HEIGHT - 32) {
+            y = Game.HEIGHT - 32;
         }
+        anim.runAnimation();
     }
 
     public void render(Graphics g) {
-        g.drawImage(text.player, (int)x, (int)y, null);
+        // g.drawImage(tex.player, (int)x, (int)y, null);
+        anim.drawAnimation(g, x, y, 0);
     }
 
-    // getters and setters
+    public Rectangle getBounds() {
+        return new Rectangle((int)x, (int)y, 32, 32); // width and height to establish the proper hitbox around a sprite
+    }
+
     public double getX() {
         return x;
     }
@@ -65,5 +67,4 @@ public class Player {
     public void setVelY(double velY) {
         this.velY = velY;
     }
-
 }
