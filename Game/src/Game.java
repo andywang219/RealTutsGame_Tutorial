@@ -34,6 +34,7 @@ public class Game extends Canvas implements Runnable { // taking everything from
     private Player p;
     private Controller c;
     private Textures tex;
+    private int count;
 
     public LinkedList<EntityA> ea;
     public LinkedList<EntityB> eb;
@@ -51,7 +52,7 @@ public class Game extends Canvas implements Runnable { // taking everything from
 
         addKeyListener(new KeyInput(this));
         tex = new Textures(this);
-        p = new Player(200, 200, tex);
+        p = new Player(200, 200, tex, this);
         c = new Controller(tex, this);
 
         c.createEnemy(enemy_count);
@@ -119,6 +120,10 @@ public class Game extends Canvas implements Runnable { // taking everything from
             enemy_killed = 0;
             c.createEnemy(enemy_count);
         }
+        if (count++ % 100 == 0) {
+            c.createFruit();
+        }
+        //System.out.println(count++);
     }
 
     // eveything in game that renders

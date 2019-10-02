@@ -6,12 +6,14 @@ public class Player extends GameObject implements EntityA {
     private double velX = 0;
     private double velY = 0;
     private Textures tex;
+    private Game game;
     private Animation anim;
 
-    public Player(double x, double y, Textures tex) {
+    public Player(double x, double y, Textures tex, Game game) {
         // intialize player's location in the game
         super(x, y); // from game object class
         this.tex = tex;
+        this.game = game;
         anim = new Animation(tex.player, 3, 6, 1, 3); // frames, speed, 1 column by 3 rows (last 2 parameters)
         // format: frames, speed, col, row
     }

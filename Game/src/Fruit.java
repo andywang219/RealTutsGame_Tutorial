@@ -5,13 +5,14 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 // For static fruit on the screen
-public class Fruit extends GameObject implements EntityA {
+public class Fruit extends GameObject implements EntityB {
     private Textures fruits;
     private ArrayList<BufferedImage> current_fruit;
     private Game game;
     private Controller c;
     private Random r = new Random();
     private int index;
+    private boolean is_spawned = false;
 
     public Fruit(double x, double y, Textures fruits, Controller c, Game game) {
         super(x, y);
@@ -33,10 +34,18 @@ public class Fruit extends GameObject implements EntityA {
         if(x >= Game.WIDTH - 32) x = Game.WIDTH - 32;
         if(y <= 0) y = 0;
         if(y >= Game.HEIGHT - 32) y = Game.HEIGHT - 32;
+        if (Physics.Collision(this, game.ea)) {
+            c.removeEntity(this);
+            //game.setEnemy_killed(game.getEnemy_killed() + 1);
+        }
     }
 
     public void render(Graphics g) {
-        index = r.nextInt(5); // random index for current fruit
+        if (!is_spawned) {
+            index = r.nextInt(5); // random index for current fruit
+            g.drawImage(current_fruit.get(index), (int) x, (int) y, null); // randomly spawn specific fruit
+            is_spawned = true;
+        }
         g.drawImage(current_fruit.get(index), (int) x, (int) y, null); // randomly spawn specific fruit
     }
 

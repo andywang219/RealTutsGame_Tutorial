@@ -27,6 +27,14 @@ public class Controller {
         }
     }
 
+    //public void createPlayer() {
+
+    //}
+
+    public void createFruit() {
+        addEntity(new Fruit(r.nextInt(Game.WIDTH - 32), r.nextInt(Game.HEIGHT - 32), tex, this, game)); 
+    }
+
     public void tick() {
         // 'A' CLASS
         for (int i = 0; i < ea.size(); i++) {
