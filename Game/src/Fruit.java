@@ -9,15 +9,17 @@ public class Fruit extends GameObject implements EntityB {
     private Textures fruits;
     private ArrayList<BufferedImage> current_fruit;
     private Game game;
+    private Player p;
     private Controller c;
     private Random r = new Random();
     private int index;
     private boolean is_spawned = false;
 
-    public Fruit(double x, double y, Textures fruits, Controller c, Game game) {
+    public Fruit(double x, double y, Textures fruits, Controller c, Game game, Player p) {
         super(x, y);
         this.fruits = fruits;
         this.c = c;
+        this.p = p;
         this.game = game;
         current_fruit = new ArrayList<BufferedImage>();
         // The current fruit
@@ -35,6 +37,7 @@ public class Fruit extends GameObject implements EntityB {
         if(y <= 0) y = 0;
         if(y >= Game.HEIGHT - 32) y = Game.HEIGHT - 32;
         if (Physics.Collision(this, game.ea)) {
+            p.addFruit(this);
             c.removeEntity(this);
             //game.setEnemy_killed(game.getEnemy_killed() + 1);
         }
@@ -51,6 +54,10 @@ public class Fruit extends GameObject implements EntityB {
 
     public Rectangle getBounds() {
         return new Rectangle((int)x, (int)y, 32, 32); // width and height to establish the proper hitbox around a sprite
+    }
+
+    public BufferedImage getCurrentFruit() {
+        return current_fruit.get(index);
     }
 
     public double getX() {

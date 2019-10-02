@@ -27,12 +27,12 @@ public class Controller {
         }
     }
 
-    //public void createPlayer() {
+    public void createPlayer(Player p) {
+        addEntity(p);
+    }
 
-    //}
-
-    public void createFruit() {
-        addEntity(new Fruit(r.nextInt(Game.WIDTH - 32), r.nextInt(Game.HEIGHT - 32), tex, this, game)); 
+    public void createFruit(Player p) {
+        addEntity(new Fruit(r.nextInt(Game.WIDTH - 32), r.nextInt(Game.HEIGHT - 32), tex, this, game, p)); 
     }
 
     public void tick() {

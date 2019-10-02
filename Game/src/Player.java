@@ -8,12 +8,16 @@ public class Player extends GameObject implements EntityA {
     private Textures tex;
     private Game game;
     private Animation anim;
+    private Fruit has;
+    private int inventory;
+    private Fruit fired;
 
     public Player(double x, double y, Textures tex, Game game) {
         // intialize player's location in the game
         super(x, y); // from game object class
         this.tex = tex;
         this.game = game;
+        inventory = 0;
         anim = new Animation(tex.player, 3, 6, 1, 3); // frames, speed, 1 column by 3 rows (last 2 parameters)
         // format: frames, speed, col, row
     }
@@ -44,6 +48,23 @@ public class Player extends GameObject implements EntityA {
 
     public Rectangle getBounds() {
         return new Rectangle((int)x, (int)y, 32, 32); // width and height to establish the proper hitbox around a sprite
+    }
+
+    public void addFruit(Fruit f) {
+        has = f;
+        inventory = 1;
+    }
+
+    public Fruit getFruit() {
+        return has;
+    }
+
+    public int getInventory() {
+        return inventory;
+    }
+
+    public void useFruit() {
+        inventory--;
     }
 
     public double getX() {

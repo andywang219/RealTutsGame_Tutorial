@@ -55,6 +55,7 @@ public class Game extends Canvas implements Runnable { // taking everything from
         p = new Player(200, 200, tex, this);
         c = new Controller(tex, this);
 
+        c.createPlayer(p);
         c.createEnemy(enemy_count);
         ea = c.getEntityA();
         eb = c.getEntityB();
@@ -121,7 +122,7 @@ public class Game extends Canvas implements Runnable { // taking everything from
             c.createEnemy(enemy_count);
         }
         if (count++ % 100 == 0) {
-            c.createFruit();
+            c.createFruit(p);
         }
         //System.out.println(count++);
     }
@@ -159,8 +160,11 @@ public class Game extends Canvas implements Runnable { // taking everything from
         } else if (key == KeyEvent.VK_W) {
             p.setVelY(-5);
         } else if (key == KeyEvent.VK_SPACE && !is_shooting) {
+            if (p.getFruit() != null && p.getInventory() > 0) {
+                p.useFruit();
+                c.addEntity(new Bullet(p.getX(), p.getY(), tex, this, p));
+            }
             is_shooting = true;
-            c.addEntity(new Bullet(p.getX(), p.getY(), tex, this));
         }
     }
 
