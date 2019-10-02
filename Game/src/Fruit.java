@@ -8,6 +8,7 @@ import java.util.Random;
 public class Fruit extends GameObject implements EntityB {
     private Textures fruits;
     private ArrayList<BufferedImage> current_fruit;
+    private ArrayList<BufferedImage> current_fruit_a;
     private Game game;
     private Player p;
     private Controller c;
@@ -22,12 +23,19 @@ public class Fruit extends GameObject implements EntityB {
         this.p = p;
         this.game = game;
         current_fruit = new ArrayList<BufferedImage>();
+        current_fruit_a = new ArrayList<BufferedImage>();
         // The current fruit
         current_fruit.add(fruits.apple);
         current_fruit.add(fruits.orange);
         current_fruit.add(fruits.watermelon);
         current_fruit.add(fruits.grape);
         current_fruit.add(fruits.banana);
+        // animated fruit
+        current_fruit_a.add(fruits.apple_a);
+        current_fruit_a.add(fruits.orange_a);
+        current_fruit_a.add(fruits.watermelon_a);
+        current_fruit_a.add(fruits.grape_a);
+        current_fruit_a.add(fruits.banana_a);
     }
 
     public void tick() {
@@ -57,7 +65,7 @@ public class Fruit extends GameObject implements EntityB {
     }
 
     public BufferedImage getCurrentFruit() {
-        return current_fruit.get(index);
+        return current_fruit_a.get(index);
     }
 
     public double getX() {

@@ -14,7 +14,7 @@ public class Bullet extends GameObject implements EntityA {
         this.tex = tex;
         this.p = p;
         this.game = game;
-        //anim = new Animation(tex.missile, 3, 6, 1, 3);
+        anim = new Animation(p.getFruit().getCurrentFruit(), 3, 6, 1, 3);
     }
 
     public void tick() {
@@ -22,15 +22,15 @@ public class Bullet extends GameObject implements EntityA {
         /*if (Physics.Collision(this, game.eb)) {
             System.out.println("COLLISION DETECTED");
         }*/
-       // anim.runAnimation();
+       anim.runAnimation();
     }
 
     public void render(Graphics g) {
         if (currentFruit == null) {
             currentFruit = p.getFruit().getCurrentFruit();
         }
-        g.drawImage(currentFruit, (int) x, (int) y, null);
-        //anim.drawAnimation(g, x, y, 0);
+        // g.drawImage(currentFruit, (int) x, (int) y, null);
+        anim.drawAnimation(g, x, y, 0);
     }
 
     public Rectangle getBounds() {
